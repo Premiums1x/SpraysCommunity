@@ -43,6 +43,7 @@ public class CheckInServiceImpl implements CheckInService {
         checkIn.setUserId(userId);
         checkIn.setAnimalId(request.getAnimalId());
         checkIn.setContent(request.getContent());
+        checkIn.setAnonymous(Boolean.TRUE.equals(request.getAnonymous()));
         checkInMapper.insert(checkIn);
     }
 
@@ -60,13 +61,19 @@ public class CheckInServiceImpl implements CheckInService {
             vo.setUserId(((Number) map.get("user_id")).longValue());
             vo.setAnimalId(((Number) map.get("animal_id")).longValue());
             vo.setContent((String) map.get("content"));
+            Boolean anonymous = toBoolean(map.get("is_anonymous"));
+            vo.setAnonymous(anonymous);
             // 处理时间类型
             Object createTimeObj = map.get("create_time");
             if (createTimeObj instanceof java.time.LocalDateTime) {
                 vo.setCreateTime((java.time.LocalDateTime) createTimeObj);
             }
-            vo.setUserNickname((String) map.get("user_nickname"));
-            vo.setUserAvatar((String) map.get("user_avatar"));
+            String username = (String) map.get("username");
+            String userNickname = (String) map.get("user_nickname");
+            vo.setUsername(Boolean.TRUE.equals(anonymous) ? null : username);
+            vo.setUserNickname(Boolean.TRUE.equals(anonymous) ? null : userNickname);
+            vo.setUserDisplayName(Boolean.TRUE.equals(anonymous) ? "匿名用户" : getDisplayName(userNickname, username));
+            vo.setUserAvatar(Boolean.TRUE.equals(anonymous) ? null : (String) map.get("user_avatar"));
             return vo;
         }).collect(Collectors.toList());
         voPage.setRecords(voList);
@@ -91,6 +98,7 @@ public class CheckInServiceImpl implements CheckInService {
             vo.setUserId(checkIn.getUserId());
             vo.setAnimalId(checkIn.getAnimalId());
             vo.setContent(checkIn.getContent());
+            vo.setAnonymous(checkIn.getAnonymous());
             vo.setCreateTime(checkIn.getCreateTime());
 
             // 查询关联的动物名字
@@ -103,5 +111,25 @@ public class CheckInServiceImpl implements CheckInService {
         voPage.setRecords(voList);
 
         return voPage;
+    }
+
+    private Boolean toBoolean(Object value) {
+        if (value instanceof Boolean bool) {
+            return bool;
+        }
+        if (value instanceof Number number) {
+            return number.intValue() != 0;
+        }
+        return false;
+    }
+
+    private String getDisplayName(String nickname, String username) {
+        if (nickname != null && !nickname.isBlank()) {
+            return nickname;
+        }
+        if (username != null && !username.isBlank()) {
+            return username;
+        }
+        return "匿名用户";
     }
 }

@@ -63,7 +63,7 @@
               <div class="checkin-content">
                 <div class="checkin-user">
                   <el-avatar :size="32" icon="UserFilled" />
-                  <span class="checkin-nickname">{{ checkin.nickname || checkin.username || '匿名用户' }}</span>
+                  <span class="checkin-nickname">{{ checkin.userDisplayName || checkin.userNickname || checkin.username || '匿名用户' }}</span>
                 </div>
                 <p class="checkin-text">{{ checkin.content }}</p>
               </div>
@@ -87,6 +87,13 @@
             placeholder="记录你与这只小动物的故事吧..."
             maxlength="500"
             show-word-limit
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-switch
+            v-model="checkinForm.anonymous"
+            active-text="匿名发布"
+            inactive-text="显示用户名"
           />
         </el-form-item>
       </el-form>
@@ -118,7 +125,8 @@ const submitLoading = ref(false)
 const checkinFormRef = ref(null)
 
 const checkinForm = reactive({
-  content: ''
+  content: '',
+  anonymous: false
 })
 
 const checkinRules = {
@@ -169,11 +177,13 @@ const submitCheckin = async () => {
     try {
       await request.post('/api/checkins', {
         animalId: Number(animalId),
-        content: checkinForm.content
+        content: checkinForm.content,
+        anonymous: checkinForm.anonymous
       })
       ElMessage.success('打卡成功！')
       showCheckinDialog.value = false
       checkinForm.content = ''
+      checkinForm.anonymous = false
       fetchCheckins(true)
     } catch (error) {
       // handled by interceptor

@@ -9,27 +9,23 @@
       </template>
 
       <!-- 搜索栏 -->
-      <el-row :gutter="16" class="search-row">
-        <el-col :span="8">
-          <el-input
-            v-model="searchName"
-            placeholder="搜索动物名字"
-            prefix-icon="Search"
-            clearable
-            @clear="handleSearch"
-          />
-        </el-col>
-        <el-col :span="6">
-          <el-select v-model="searchType" placeholder="全部类型" clearable style="width: 100%">
-            <el-option label="全部" value="" />
-            <el-option label="猫" :value="1" />
-            <el-option label="狗" :value="2" />
-          </el-select>
-        </el-col>
-        <el-col :span="4">
-          <el-button type="primary" icon="Search" @click="handleSearch">搜索</el-button>
-        </el-col>
-      </el-row>
+      <div class="search-row">
+        <el-input
+          v-model="searchName"
+          placeholder="搜索动物名字"
+          prefix-icon="Search"
+          clearable
+          @clear="handleSearch"
+        />
+        <el-select v-model="searchType" placeholder="全部类型" clearable>
+          <el-option label="全部" value="" />
+          <el-option label="猫" :value="1" />
+          <el-option label="狗" :value="2" />
+        </el-select>
+        <el-button class="search-button" type="primary" icon="Search" @click="handleSearch">
+          搜索
+        </el-button>
+      </div>
 
       <!-- 表格 -->
       <el-table :data="animalList" v-loading="loading" stripe style="width: 100%">
@@ -304,10 +300,14 @@ onMounted(() => {
 .animal-manage-container {
   max-width: 1200px;
   margin: 0 auto;
+  min-height: calc(100vh - 108px);
+  display: flex;
+  flex-direction: column;
 }
 
 .manage-card {
   border-radius: 12px;
+  flex: 1;
 }
 
 .card-header {
@@ -322,12 +322,31 @@ onMounted(() => {
 }
 
 .search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 140px;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
   margin-bottom: 20px;
+}
+
+.search-row :deep(.el-select) {
+  width: 100%;
+}
+
+.search-button {
+  width: 100%;
 }
 
 .pagination-wrapper {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .search-row {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

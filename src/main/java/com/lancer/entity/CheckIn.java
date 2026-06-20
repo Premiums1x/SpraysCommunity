@@ -17,6 +17,9 @@ public class CheckIn {
 
     private String content;
 
+    @TableField("is_anonymous")
+    private Boolean anonymous;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

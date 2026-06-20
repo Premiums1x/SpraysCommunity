@@ -20,7 +20,7 @@
 | MyBatis-Plus | 3.5.12 | ORM 持久层 |
 | MySQL | 8.x | 关系型数据库 |
 | JWT (jjwt) | 0.12.6 | 用户认证 |
-| Knife4j | 4.5.0 | API 文档 |
+| SpringDoc OpenAPI | 2.8.6 | API 文档 (Swagger UI) |
 
 ### 前端
 | 技术 | 说明 |
@@ -107,7 +107,7 @@ npm run dev
 ### 5. 访问系统
 
 - 前端页面：http://localhost:5173
-- API 文档：http://localhost:8080/doc.html
+- API 文档：http://localhost:8080/swagger-ui/index.html
 - 默认管理员：用户名 `admin`，密码 `admin123`
 
 ## 📡 API 接口

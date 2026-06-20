@@ -11,4 +11,6 @@ public class CheckInRequest {
 
     @NotBlank(message = "打卡内容不能为空")
     private String content;
+
+    private Boolean anonymous = false;
 }

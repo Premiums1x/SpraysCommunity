@@ -37,6 +37,13 @@
           />
         </el-form-item>
         <el-form-item>
+          <el-switch
+            v-model="checkinForm.anonymous"
+            active-text="匿名发布"
+            inactive-text="显示用户名"
+          />
+        </el-form-item>
+        <el-form-item>
           <el-button type="primary" :loading="submitLoading" @click="handleSubmit">
             提交打卡
           </el-button>
@@ -71,7 +78,8 @@ const lastAnimalId = ref(null)
 
 const checkinForm = reactive({
   animalId: null,
-  content: ''
+  content: '',
+  anonymous: false
 })
 
 const rules = {
@@ -99,7 +107,8 @@ const handleSubmit = async () => {
     try {
       await request.post('/api/checkins', {
         animalId: checkinForm.animalId,
-        content: checkinForm.content
+        content: checkinForm.content,
+        anonymous: checkinForm.anonymous
       })
       lastAnimalId.value = checkinForm.animalId
       showSuccessDialog.value = true
@@ -114,6 +123,7 @@ const handleSubmit = async () => {
 const continueCheckin = () => {
   showSuccessDialog.value = false
   checkinForm.content = ''
+  checkinForm.anonymous = false
 }
 
 const goDetail = () => {

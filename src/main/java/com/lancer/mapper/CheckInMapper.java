@@ -16,8 +16,8 @@ public interface CheckInMapper extends BaseMapper<CheckIn> {
     /**
      * 根据动物ID分页查询打卡记录（关联用户信息）
      */
-    @Select("SELECT ci.id, ci.user_id, ci.animal_id, ci.content, ci.create_time, " +
-            "u.nickname AS user_nickname, u.avatar AS user_avatar " +
+    @Select("SELECT ci.id, ci.user_id, ci.animal_id, ci.content, ci.is_anonymous, ci.create_time, " +
+            "u.username AS username, u.nickname AS user_nickname, u.avatar AS user_avatar " +
             "FROM check_in ci LEFT JOIN user u ON ci.user_id = u.id " +
             "WHERE ci.animal_id = #{animalId} " +
             "ORDER BY ci.create_time DESC")

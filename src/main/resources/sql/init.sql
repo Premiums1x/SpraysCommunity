@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `check_in` (
     `user_id` BIGINT NOT NULL COMMENT '打卡用户ID',
     `animal_id` BIGINT NOT NULL COMMENT '关联动物ID',
     `content` TEXT NOT NULL COMMENT '打卡文字描述',
+    `is_anonymous` TINYINT NOT NULL DEFAULT 0 COMMENT '是否匿名：0=否, 1=是',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '打卡时间',
     PRIMARY KEY (`id`),
     KEY `idx_animal_id_create_time` (`animal_id`, `create_time` DESC),

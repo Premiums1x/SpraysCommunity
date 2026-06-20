@@ -2,27 +2,23 @@
   <div class="animal-list-container">
     <!-- 搜索栏 -->
     <el-card class="search-bar" shadow="never">
-      <el-row :gutter="16" align="middle">
-        <el-col :span="8">
-          <el-input
-            v-model="searchName"
-            placeholder="搜索动物名字"
-            prefix-icon="Search"
-            clearable
-            @clear="handleSearch"
-          />
-        </el-col>
-        <el-col :span="6">
-          <el-select v-model="searchType" placeholder="全部类型" clearable style="width: 100%">
-            <el-option label="全部" value="" />
-            <el-option label="猫" :value="1" />
-            <el-option label="狗" :value="2" />
-          </el-select>
-        </el-col>
-        <el-col :span="4">
-          <el-button type="primary" icon="Search" @click="handleSearch">搜索</el-button>
-        </el-col>
-      </el-row>
+      <div class="search-row">
+        <el-input
+          v-model="searchName"
+          placeholder="搜索动物名字"
+          prefix-icon="Search"
+          clearable
+          @clear="handleSearch"
+        />
+        <el-select v-model="searchType" placeholder="全部类型" clearable>
+          <el-option label="全部" value="" />
+          <el-option label="猫" :value="1" />
+          <el-option label="狗" :value="2" />
+        </el-select>
+        <el-button class="search-button" type="primary" icon="Search" @click="handleSearch">
+          搜索
+        </el-button>
+      </div>
     </el-card>
 
     <!-- 动物卡片列表 -->
@@ -147,6 +143,9 @@ onMounted(() => {
 .animal-list-container {
   max-width: 1200px;
   margin: 0 auto;
+  min-height: calc(100vh - 108px);
+  display: flex;
+  flex-direction: column;
 }
 
 .search-bar {
@@ -154,8 +153,25 @@ onMounted(() => {
   border-radius: 8px;
 }
 
+.search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 140px;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.search-row :deep(.el-select) {
+  width: 100%;
+}
+
+.search-button {
+  width: 100%;
+}
+
 .animal-grid {
   min-height: 400px;
+  flex: 1;
 }
 
 .animal-card {
@@ -225,7 +241,15 @@ onMounted(() => {
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 24px;
+  margin-top: auto;
+  padding-top: 24px;
   padding-bottom: 20px;
 }
+
+@media (max-width: 768px) {
+  .search-row {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
+
