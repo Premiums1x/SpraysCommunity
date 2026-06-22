@@ -23,6 +23,32 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Autowired
     private ObjectMapper objectMapper;
 
+    /**
+     * 判断是否为公开接口（无需登录即可访问）
+     */
+    private boolean isPublicPath(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        // 登录、注册接口公开
+        if (path.equals("/api/auth/login") || path.equals("/api/auth/register")) {
+            return true;
+        }
+        // GET /api/animals（动物列表）公开
+        if ("GET".equalsIgnoreCase(method) && path.equals("/api/animals")) {
+            return true;
+        }
+        // GET /api/animals/{id}（动物详情）公开
+        if ("GET".equalsIgnoreCase(method) && path.matches("/api/animals/\\d+")) {
+            return true;
+        }
+        // GET /api/animals/{animalId}/checkins（打卡时间轴）公开
+        if ("GET".equalsIgnoreCase(method) && path.matches("/api/animals/\\d+/checkins")) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 放行非方法请求（如静态资源）
@@ -37,13 +63,23 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         // 获取 Token
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        boolean hasToken = authHeader != null && authHeader.startsWith("Bearer ");
+
+        // 无 Token 时，检查是否为公开接口
+        if (!hasToken) {
+            if (isPublicPath(request)) {
+                return true;
+            }
             sendError(response, 401, "未登录，请先登录");
             return false;
         }
 
         String token = authHeader.substring(7);
         if (!jwtUtils.validateToken(token)) {
+            // Token 无效时，公开接口也放行（但不设置用户上下文）
+            if (isPublicPath(request)) {
+                return true;
+            }
             sendError(response, 401, "登录已过期，请重新登录");
             return false;
         }

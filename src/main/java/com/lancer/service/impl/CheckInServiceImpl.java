@@ -90,7 +90,18 @@ public class CheckInServiceImpl implements CheckInService {
                .orderByDesc(CheckIn::getCreateTime);
         IPage<CheckIn> checkInPage = checkInMapper.selectPage(pageParam, wrapper);
 
-        // 转换为 VO（补充动物名字）
+        // 批量查询关联的动物名称（避免 N+1 查询）
+        List<Long> animalIds = checkInPage.getRecords().stream()
+                .map(CheckIn::getAnimalId)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Long, String> animalNameMap = new java.util.HashMap<>();
+        if (!animalIds.isEmpty()) {
+            List<Animal> animals = animalMapper.selectBatchIds(animalIds);
+            animals.forEach(a -> animalNameMap.put(a.getId(), a.getName()));
+        }
+
+        // 转换为 VO
         Page<CheckInVO> voPage = new Page<>(page, size, checkInPage.getTotal());
         List<CheckInVO> voList = checkInPage.getRecords().stream().map(checkIn -> {
             CheckInVO vo = new CheckInVO();
@@ -100,12 +111,7 @@ public class CheckInServiceImpl implements CheckInService {
             vo.setContent(checkIn.getContent());
             vo.setAnonymous(checkIn.getAnonymous());
             vo.setCreateTime(checkIn.getCreateTime());
-
-            // 查询关联的动物名字
-            Animal animal = animalMapper.selectById(checkIn.getAnimalId());
-            if (animal != null) {
-                vo.setAnimalName(animal.getName());
-            }
+            vo.setAnimalName(animalNameMap.getOrDefault(checkIn.getAnimalId(), "未知动物"));
             return vo;
         }).collect(Collectors.toList());
         voPage.setRecords(voList);
