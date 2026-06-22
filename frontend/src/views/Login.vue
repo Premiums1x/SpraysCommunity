@@ -32,7 +32,7 @@
           <el-button
             type="primary"
             size="large"
-            style="width: 100%"
+            class="login-btn"
             :loading="loading"
             @click="handleLogin"
           >
@@ -92,41 +92,43 @@ const handleLogin = async () => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: var(--color-bg);
 }
 
 .login-card {
-  width: 420px;
-  padding: 20px;
-  border-radius: 12px;
+  width: 380px;
+  padding: var(--space-2);
+  border-radius: var(--radius-xl);
 }
 
 .login-title {
   text-align: center;
-  font-size: 24px;
-  color: #303133;
-  margin-bottom: 8px;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-bottom: var(--space-1);
+  letter-spacing: -0.02em;
 }
 
 .login-subtitle {
   text-align: center;
-  color: #909399;
-  margin-bottom: 24px;
-  font-size: 14px;
+  color: var(--color-ink-muted);
+  margin-bottom: var(--space-8);
+  font-size: var(--text-sm);
 }
 
 .login-footer {
   text-align: center;
-  color: #909399;
-  font-size: 14px;
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
 }
 
 .login-footer a {
-  color: #409eff;
-  text-decoration: none;
+  color: var(--color-primary);
+  font-weight: 500;
 }
 
-.login-footer a:hover {
-  text-decoration: underline;
+.login-btn {
+  width: 100%;
 }
 </style>

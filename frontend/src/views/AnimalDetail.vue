@@ -201,20 +201,23 @@ onMounted(() => {
 
 <style scoped>
 .animal-detail-container {
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
+/* ── Info Card ── */
 .info-card {
-  margin-bottom: 24px;
-  border-radius: 12px;
+  border: 1px solid var(--color-gray-100);
 }
 
 .detail-cover {
-  height: 320px;
-  border-radius: 8px;
+  height: 340px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  background-color: #f5f7fa;
+  background-color: var(--color-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -230,86 +233,103 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #c0c4cc;
-  gap: 8px;
+  color: var(--color-ink-muted);
+  gap: var(--space-2);
+  font-size: var(--text-sm);
 }
 
 .detail-info {
-  padding: 10px 0;
+  padding: var(--space-2) 0;
 }
 
 .detail-name {
-  font-size: 28px;
-  color: #303133;
-  margin: 0 0 16px;
+  font-size: var(--text-3xl);
+  font-weight: 750;
+  color: var(--color-ink);
+  margin: 0 0 var(--space-4);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .detail-tags {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
 }
 
 .detail-desc {
-  margin-bottom: 20px;
+  margin-bottom: var(--space-6);
 }
 
 .detail-desc h4 {
-  color: #606266;
-  margin: 0 0 8px;
+  color: var(--color-ink-secondary);
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
 .detail-desc p {
-  color: #909399;
-  line-height: 1.6;
+  color: var(--color-ink-secondary);
+  line-height: 1.7;
   margin: 0;
+  font-size: var(--text-sm);
 }
 
+/* ── Timeline Card ── */
 .timeline-card {
-  border-radius: 12px;
-}
-
-.timeline-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  border: 1px solid var(--color-gray-100);
 }
 
 .timeline-header h3 {
   margin: 0;
-  color: #303133;
+  color: var(--color-ink);
+  font-size: var(--text-lg);
 }
 
 .checkin-card {
-  border-radius: 8px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-md);
 }
 
 .checkin-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .checkin-user {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .checkin-nickname {
-  font-weight: 500;
-  color: #303133;
-  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  font-size: var(--text-sm);
 }
 
 .checkin-text {
   margin: 0;
-  color: #606266;
-  line-height: 1.6;
+  color: var(--color-ink-secondary);
+  line-height: 1.7;
+  font-size: var(--text-sm);
 }
 
 .load-more {
   text-align: center;
-  margin-top: 16px;
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .detail-cover {
+    height: 240px;
+  }
+
+  .detail-name {
+    font-size: var(--text-2xl);
+    margin-top: var(--space-4);
+  }
 }
 </style>

@@ -29,29 +29,28 @@
 
       <!-- 表格 -->
       <el-table :data="animalList" v-loading="loading" stripe style="width: 100%">
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="name" label="名字" width="120" />
-        <el-table-column label="类型" width="100">
+        <el-table-column prop="id" label="ID" min-width="70" />
+        <el-table-column prop="name" label="名字" min-width="100" />
+        <el-table-column label="类型" min-width="80">
           <template #default="{ row }">
             <el-tag :type="row.type === 1 ? 'warning' : 'success'" size="small">
               {{ row.type === 1 ? '猫' : '狗' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="area" label="常驻区域" width="150" />
-        <el-table-column label="封面" width="100">
+        <el-table-column prop="area" label="常驻区域" min-width="120" />
+        <el-table-column label="封面" min-width="80">
           <template #default="{ row }">
-            <el-image
+            <img
               v-if="row.coverImage"
               :src="'/uploads/' + row.coverImage"
-              style="width: 50px; height: 50px; border-radius: 6px;"
-              fit="cover"
-              :preview-src-list="['/uploads/' + row.coverImage]"
+              class="cover-thumb"
+              @click="handlePreviewCover(row.coverImage)"
             />
-            <span v-else style="color: #c0c4cc;">无</span>
+            <span v-else class="no-cover">无</span>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="录入时间" width="180" />
+        <el-table-column prop="createTime" label="录入时间" min-width="160" :formatter="formatTime" />
         <el-table-column label="操作" fixed="right" width="160">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="handleEdit(row)">编辑</el-button>
@@ -141,6 +140,12 @@
         </el-button>
       </template>
     </el-dialog>
+    <!-- 封面预览弹窗 -->
+    <el-dialog v-model="previewVisible" title="封面预览" width="600px" :close-on-click-modal="true">
+      <div class="preview-body">
+        <img :src="previewUrl" class="preview-image" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -164,6 +169,13 @@ const formRef = ref(null)
 const uploadRef = ref(null)
 const selectedFile = ref(null)
 const editId = ref(null)
+const previewVisible = ref(false)
+const previewUrl = ref('')
+
+const handlePreviewCover = (coverImage) => {
+  previewUrl.value = '/uploads/' + coverImage
+  previewVisible.value = true
+}
 
 const animalForm = reactive({
   name: '',
@@ -246,12 +258,18 @@ const handleSubmit = async () => {
     submitLoading.value = true
     try {
       if (isEdit.value) {
-        // 编辑 - 使用 JSON
-        await request.put(`/api/animals/${editId.value}`, {
-          name: animalForm.name,
-          type: animalForm.type,
-          area: animalForm.area,
-          description: animalForm.description
+        const formData = new FormData()
+        formData.append('name', animalForm.name)
+        formData.append('type', animalForm.type)
+        formData.append('area', animalForm.area)
+        if (animalForm.description) {
+          formData.append('description', animalForm.description)
+        }
+        if (selectedFile.value) {
+          formData.append('file', selectedFile.value)
+        }
+        await request.put(`/api/animals/${editId.value}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
         })
         ElMessage.success('修改成功')
       } else {
@@ -291,6 +309,11 @@ const handleDelete = async (id) => {
   }
 }
 
+const formatTime = (row, column, cellValue) => {
+  if (!cellValue) return ''
+  return cellValue.replace('T', ' ').substring(0, 19)
+}
+
 onMounted(() => {
   fetchAnimals()
 })
@@ -298,16 +321,15 @@ onMounted(() => {
 
 <style scoped>
 .animal-manage-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: calc(100vh - 108px);
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .manage-card {
-  border-radius: 12px;
+  border: 1px solid var(--color-gray-100);
   flex: 1;
+  width: 100%;
 }
 
 .card-header {
@@ -318,35 +340,84 @@ onMounted(() => {
 
 .page-title {
   margin: 0;
-  color: #303133;
+  color: var(--color-ink);
+  font-size: var(--text-xl);
+  font-weight: 650;
 }
 
+/* ── Search Row ── */
 .search-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 140px;
+  display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-3);
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
+}
+
+.search-row :deep(.el-input) {
+  flex: 1;
+  min-width: 0;
 }
 
 .search-row :deep(.el-select) {
-  width: 100%;
+  width: 160px;
+  flex-shrink: 0;
 }
 
 .search-button {
-  width: 100%;
+  flex-shrink: 0;
 }
 
+/* ── Pagination ── */
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: var(--space-5);
 }
 
 @media (max-width: 768px) {
   .search-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
+
+  .search-row :deep(.el-select) {
+    width: 100%;
+  }
+}
+
+/* ── Cover Thumb ── */
+.cover-thumb {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.cover-thumb:hover {
+  opacity: 0.8;
+}
+
+.no-cover {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+/* ── Preview Dialog ── */
+.preview-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-gray-100);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
 }
 </style>

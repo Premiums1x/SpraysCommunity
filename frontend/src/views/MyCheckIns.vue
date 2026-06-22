@@ -90,54 +90,64 @@ onMounted(() => {
 
 <style scoped>
 .my-checkins-container {
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
 .checkins-card {
-  border-radius: 12px;
+  border: 1px solid var(--color-gray-100);
 }
 
 .page-title {
   margin: 0;
-  color: #303133;
+  color: var(--color-ink);
+  font-size: var(--text-xl);
+  font-weight: 650;
 }
 
 .checkin-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .checkin-item {
-  border-radius: 8px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-md);
+  transition: box-shadow 0.2s var(--ease-out-quart);
+}
+
+.checkin-item:hover {
+  box-shadow: var(--shadow-sm);
 }
 
 .checkin-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-3);
 }
 
 .animal-tag {
   cursor: pointer;
+  font-weight: 500;
 }
 
 .checkin-time {
-  font-size: 13px;
-  color: #909399;
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
 }
 
 .checkin-content {
   margin: 0;
-  color: #606266;
-  line-height: 1.6;
+  color: var(--color-ink-secondary);
+  line-height: 1.7;
+  font-size: var(--text-sm);
 }
 
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 24px;
+  margin-top: var(--space-6);
 }
 </style>

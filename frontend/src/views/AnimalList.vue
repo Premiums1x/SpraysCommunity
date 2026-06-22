@@ -143,54 +143,65 @@ onMounted(() => {
 .animal-list-container {
   max-width: 1200px;
   margin: 0 auto;
-  min-height: calc(100vh - 108px);
   display: flex;
   flex-direction: column;
+  gap: var(--space-6);
 }
 
+/* ── Search Bar ── */
 .search-bar {
-  margin-bottom: 20px;
-  border-radius: 8px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-lg);
 }
 
 .search-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 140px;
+  display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-3);
   width: 100%;
+}
+
+.search-row :deep(.el-input) {
+  flex: 1;
+  min-width: 0;
 }
 
 .search-row :deep(.el-select) {
-  width: 100%;
+  width: 160px;
+  flex-shrink: 0;
 }
 
 .search-button {
-  width: 100%;
+  flex-shrink: 0;
 }
 
+/* ── Card Grid ── */
 .animal-grid {
-  min-height: 400px;
-  flex: 1;
+  min-height: 300px;
+}
+
+.animal-grid :deep(.el-row) {
+  row-gap: var(--space-5);
 }
 
 .animal-card {
-  margin-bottom: 20px;
-  border-radius: 12px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
   overflow: hidden;
+  transition: transform 0.3s var(--ease-out-quart),
+              box-shadow 0.3s var(--ease-out-quart);
 }
 
 .animal-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
 .animal-cover {
-  height: 200px;
+  height: 220px;
   overflow: hidden;
-  background-color: #f5f7fa;
+  background-color: var(--color-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -207,18 +218,20 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #c0c4cc;
-  gap: 8px;
+  color: var(--color-ink-muted);
+  gap: var(--space-2);
+  font-size: var(--text-sm);
 }
 
 .animal-info {
-  padding: 16px;
+  padding: var(--space-4) var(--space-5);
 }
 
 .animal-name {
-  margin: 0 0 10px;
-  font-size: 16px;
-  color: #303133;
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -231,24 +244,28 @@ onMounted(() => {
 }
 
 .animal-area {
-  font-size: 13px;
-  color: #909399;
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
+/* ── Pagination ── */
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: auto;
-  padding-top: 24px;
-  padding-bottom: 20px;
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
 }
 
 @media (max-width: 768px) {
   .search-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .search-row :deep(.el-select) {
+    width: 100%;
   }
 }
 </style>

@@ -138,16 +138,18 @@ onMounted(() => {
 
 <style scoped>
 .checkin-container {
-  max-width: 700px;
+  max-width: 680px;
   margin: 0 auto;
 }
 
 .checkin-card {
-  border-radius: 12px;
+  border: 1px solid var(--color-gray-100);
 }
 
 .page-title {
   margin: 0;
-  color: #303133;
+  color: var(--color-ink);
+  font-size: var(--text-xl);
+  font-weight: 650;
 }
 </style>

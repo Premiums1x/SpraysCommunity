@@ -50,7 +50,7 @@
           <el-button
             type="primary"
             size="large"
-            style="width: 100%"
+            class="register-btn"
             :loading="loading"
             @click="handleRegister"
           >
@@ -137,41 +137,43 @@ const handleRegister = async () => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: var(--color-bg);
 }
 
 .register-card {
-  width: 420px;
-  padding: 20px;
-  border-radius: 12px;
+  width: 380px;
+  padding: var(--space-2);
+  border-radius: var(--radius-xl);
 }
 
 .register-title {
   text-align: center;
-  font-size: 24px;
-  color: #303133;
-  margin-bottom: 8px;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-bottom: var(--space-1);
+  letter-spacing: -0.02em;
 }
 
 .register-subtitle {
   text-align: center;
-  color: #909399;
-  margin-bottom: 24px;
-  font-size: 14px;
+  color: var(--color-ink-muted);
+  margin-bottom: var(--space-8);
+  font-size: var(--text-sm);
 }
 
 .register-footer {
   text-align: center;
-  color: #909399;
-  font-size: 14px;
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
 }
 
 .register-footer a {
-  color: #409eff;
-  text-decoration: none;
+  color: var(--color-primary);
+  font-weight: 500;
 }
 
-.register-footer a:hover {
-  text-decoration: underline;
+.register-btn {
+  width: 100%;
 }
 </style>
