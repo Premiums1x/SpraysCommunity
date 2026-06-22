@@ -9,6 +9,6 @@ public interface AnimalService {
     IPage<Animal> getAnimalList(AnimalQueryRequest request);
     Animal getAnimalById(Long id);
     void addAnimal(Animal animal, MultipartFile file);
-    void updateAnimal(Long id, Animal animal);
+    void updateAnimal(Long id, String name, Integer type, String area, String description, MultipartFile file);
     void deleteAnimal(Long id);
 }

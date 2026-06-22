@@ -34,16 +34,16 @@ public class CheckInServiceImpl implements CheckInService {
     @Override
     public void createCheckIn(CheckInRequest request, Long userId) {
         // 验证动物是否存在
-        Animal animal = animalMapper.selectById(request.getAnimalId());
+        Animal animal = animalMapper.selectById(request.animalId());
         if (animal == null) {
             throw new BusinessException(404, "动物档案不存在");
         }
 
         CheckIn checkIn = new CheckIn();
         checkIn.setUserId(userId);
-        checkIn.setAnimalId(request.getAnimalId());
-        checkIn.setContent(request.getContent());
-        checkIn.setAnonymous(Boolean.TRUE.equals(request.getAnonymous()));
+        checkIn.setAnimalId(request.animalId());
+        checkIn.setContent(request.content());
+        checkIn.setAnonymous(Boolean.TRUE.equals(request.anonymous()));
         checkInMapper.insert(checkIn);
     }
 

@@ -30,14 +30,14 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> login(LoginRequest request) {
         // 查找用户
         User user = userMapper.selectOne(
-                new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())
+                new LambdaQueryWrapper<User>().eq(User::getUsername, request.username())
         );
         if (user == null) {
             throw new BusinessException(401, "用户名或密码错误");
         }
 
         // 验证密码
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new BusinessException(401, "用户名或密码错误");
         }
 
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     public void register(RegisterRequest request) {
         // 检查用户名是否已存在
         Long count = userMapper.selectCount(
-                new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())
+                new LambdaQueryWrapper<User>().eq(User::getUsername, request.username())
         );
         if (count > 0) {
             throw new BusinessException(400, "用户名已存在");
@@ -64,9 +64,9 @@ public class UserServiceImpl implements UserService {
 
         // 创建用户
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setNickname(request.getNickname() != null ? request.getNickname() : request.getUsername());
+        user.setUsername(request.username());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setNickname(request.nickname() != null ? request.nickname() : request.username());
         user.setRole(0); // 默认普通用户
         userMapper.insert(user);
     }

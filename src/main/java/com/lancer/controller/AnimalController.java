@@ -62,8 +62,14 @@ public class AnimalController {
      */
     @PutMapping("/{id}")
     @RequireAdmin
-    public Result<Void> updateAnimal(@PathVariable Long id, @RequestBody Animal animal) {
-        animalService.updateAnimal(id, animal);
+    public Result<Void> updateAnimal(
+            @PathVariable Long id,
+            @RequestParam("name") String name,
+            @RequestParam("type") Integer type,
+            @RequestParam("area") String area,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
+        animalService.updateAnimal(id, name, type, area, description, file);
         return Result.success("动物档案更新成功", null);
     }
 

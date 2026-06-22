@@ -1,11 +1,17 @@
 package com.lancer.dto;
 
-import lombok.Data;
-
-@Data
-public class AnimalQueryRequest {
-    private String name;      // 模糊查询名字
-    private Integer type;     // 类型筛选：1=猫, 2=狗, null=全部
-    private Integer page = 1;
-    private Integer size = 10;
+public record AnimalQueryRequest(
+        String name,
+        Integer type,
+        Integer page,
+        Integer size
+) {
+    public AnimalQueryRequest {
+        if (page == null || page < 1) {
+            page = 1;
+        }
+        if (size == null || size < 1) {
+            size = 10;
+        }
+    }
 }

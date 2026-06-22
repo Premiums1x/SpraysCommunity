@@ -25,16 +25,16 @@ public class AnimalServiceImpl implements AnimalService {
 
     @Override
     public IPage<Animal> getAnimalList(AnimalQueryRequest request) {
-        Page<Animal> page = new Page<>(request.getPage(), request.getSize());
+        Page<Animal> page = new Page<>(request.page(), request.size());
         LambdaQueryWrapper<Animal> wrapper = new LambdaQueryWrapper<>();
 
         // 模糊查询名字
-        if (StringUtils.hasText(request.getName())) {
-            wrapper.like(Animal::getName, request.getName());
+        if (StringUtils.hasText(request.name())) {
+            wrapper.like(Animal::getName, request.name());
         }
         // 类型筛选
-        if (request.getType() != null) {
-            wrapper.eq(Animal::getType, request.getType());
+        if (request.type() != null) {
+            wrapper.eq(Animal::getType, request.type());
         }
         // 按创建时间倒序
         wrapper.orderByDesc(Animal::getCreateTime);
@@ -62,13 +62,22 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     @Override
-    public void updateAnimal(Long id, Animal animal) {
+    public void updateAnimal(Long id, String name, Integer type, String area, String description, MultipartFile file) {
         Animal existing = animalMapper.selectById(id);
         if (existing == null) {
             throw new BusinessException(404, "动物档案不存在");
         }
-        animal.setId(id);
-        animalMapper.updateById(animal);
+        existing.setName(name);
+        existing.setType(type);
+        existing.setArea(area);
+        existing.setDescription(description);
+
+        if (file != null && !file.isEmpty()) {
+            String fileName = fileService.upload(file);
+            existing.setCoverImage(fileName);
+        }
+
+        animalMapper.updateById(existing);
     }
 
     @Override
