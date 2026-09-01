@@ -1,21 +1,24 @@
 package com.lancer.config;
 
 import com.lancer.interceptor.JwtInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Paths;
+
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private JwtInterceptor jwtInterceptor;
+    private final JwtInterceptor jwtInterceptor;
+    private final String uploadPath;
 
-    @Value("${app.upload.path}")
-    private String uploadPath;
+    public WebMvcConfig(JwtInterceptor jwtInterceptor, @Value("${app.upload.path}") String uploadPath) {
+        this.jwtInterceptor = jwtInterceptor;
+        this.uploadPath = uploadPath;
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -23,10 +26,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
                         "/api/auth/login",
-                        "/api/auth/register",
-                        "/api/animals",
-                        "/api/animals/*",
-                        "/api/animals/*/checkins"
+                        "/api/auth/register"
                 );
     }
 
@@ -34,6 +34,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 映射上传文件的访问路径
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath);
+                .addResourceLocations(Paths.get(uploadPath).toAbsolutePath().normalize().toUri().toString());
     }
 }

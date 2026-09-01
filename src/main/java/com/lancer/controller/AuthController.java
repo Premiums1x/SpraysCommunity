@@ -7,7 +7,6 @@ import com.lancer.entity.User;
 import com.lancer.service.UserService;
 import com.lancer.utils.UserContext;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -16,8 +15,11 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {

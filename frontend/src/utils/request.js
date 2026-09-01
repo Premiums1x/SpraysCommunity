@@ -1,11 +1,21 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import router from '../router'
 
 const request = axios.create({
   baseURL: '',
-  timeout: 10000
+  timeout: 15000
 })
+
+const clearSession = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('userInfo')
+}
+
+const redirectToLogin = () => {
+  if (window.location.pathname === '/login') return
+  const redirect = encodeURIComponent(window.location.pathname + window.location.search)
+  window.location.assign(`/login?redirect=${redirect}`)
+}
 
 // 请求拦截器 - 添加 Token
 request.interceptors.request.use(
@@ -28,8 +38,8 @@ request.interceptors.response.use(
     if (res.code !== 200) {
       ElMessage.error(res.message || '请求失败')
       if (res.code === 401) {
-        localStorage.removeItem('token')
-        router.push('/login')
+        clearSession()
+        redirectToLogin()
       }
       return Promise.reject(new Error(res.message || '请求失败'))
     }
@@ -38,8 +48,8 @@ request.interceptors.response.use(
   error => {
     ElMessage.error(error.response?.data?.message || '网络错误')
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      router.push('/login')
+      clearSession()
+      redirectToLogin()
     }
     return Promise.reject(error)
   }

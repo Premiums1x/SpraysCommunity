@@ -1,90 +1,84 @@
-# 🐾 校园流浪动物图鉴与动态打卡系统
+# 校园流浪动物图鉴与动态打卡系统
 
-基于 Spring Boot 3 + Vue 3 的前后端分离全栈项目，用于校园流浪动物信息管理与近况打卡。
+面向校园师生与志愿者的流浪动物档案、近况记录和协作照护平台。项目采用 Spring Boot 3 + Vue 3 的前后端分离架构，并保持为易维护的模块化单体。
 
-## 📋 项目简介
+## 主要能力
 
-本系统是一个面向校园师生的流浪动物管理平台，核心功能包括：
+- 公开浏览和筛选校园猫狗档案，无需登录
+- 动物护照：别名、性别、性格标签、绝育情况、健康状态、首次发现日期与活跃时段
+- 登录用户发布实名或匿名近况，查看自己的历史记录
+- 管理员维护动物档案和封面图片
+- 按动物查看近况时间轴，匿名记录在数据查询层完成脱敏
+- 响应式界面、系统深色模式、加载/错误/空状态
 
-- **动物图鉴管理**：管理员录入、更新和维护校园流浪动物电子档案
-- **偶遇打卡动态**：用户在校园内偶遇小动物时发布近况打卡
-- **时间轴查询**：按动物查看历史打卡动态，了解动物近况
+## 技术栈
 
-## 🛠️ 技术栈
+后端使用 Java 21、Spring Boot 3.5、MyBatis-Plus、MySQL 8、Flyway、JWT 和 BCrypt。前端使用 Vue 3、Vite、Pinia、Vue Router、Axios 与 Element Plus。
 
-### 后端
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| Spring Boot | 3.5.14 | 核心框架 |
-| Java | 21 | 开发语言 |
-| MyBatis-Plus | 3.5.12 | ORM 持久层 |
-| MySQL | 8.x | 关系型数据库 |
-| JWT (jjwt) | 0.12.6 | 用户认证 |
-| SpringDoc OpenAPI | 2.8.6 | API 文档 (Swagger UI) |
+## 项目结构
 
-### 前端
-| 技术 | 说明 |
-|------|------|
-| Vue 3 | 前端框架（Composition API） |
-| Vite | 构建工具 |
-| Vue Router 4 | 路由管理 |
-| Pinia | 状态管理 |
-| Axios | HTTP 请求 |
-| Element Plus | UI 组件库 |
-
-## 📁 项目结构
-
-```
-StraysCommunity/
-├── src/main/java/com/lancer/     # 后端 Java 源码
-│   ├── config/                   # 配置类（CORS、MyBatis-Plus、WebMvc）
-│   ├── common/                   # 通用组件（Result、异常处理）
-│   ├── entity/                   # 实体类
-│   ├── dto/                      # 数据传输对象
-│   ├── mapper/                   # MyBatis-Plus Mapper
-│   ├── service/                  # 业务逻辑层
-│   ├── controller/               # RESTful 控制器
-│   ├── interceptor/              # JWT 拦截器
-│   ├── annotation/               # 自定义注解
-│   └── utils/                    # 工具类
-├── src/main/resources/
-│   ├── application.yaml          # 应用配置
-│   └── sql/init.sql              # 数据库初始化脚本
-├── frontend/                     # Vue 3 前端项目
-│   ├── src/views/                # 页面组件
-│   ├── src/stores/               # Pinia 状态管理
-│   ├── src/router/               # 路由配置
-│   ├── src/utils/                # 工具（Axios 封装）
-│   └── src/layout/               # 布局组件
-└── pom.xml                       # Maven 配置
+```text
+SpraysCommunity/
+├── src/main/java/com/lancer/
+│   ├── controller/       # HTTP 边界与权限声明
+│   ├── service/          # 业务流程与事务边界
+│   ├── mapper/           # 数据访问及关联查询
+│   ├── dto/              # 输入、输出和分页契约
+│   ├── entity/           # 数据库实体
+│   ├── interceptor/      # JWT 认证和管理员授权
+│   ├── config/           # 跨域、静态资源和初始化配置
+│   └── common/           # 统一响应与异常语义
+├── src/main/resources/db/migration/  # Flyway 数据库版本
+├── src/test/                         # 权限、文件和查询边界测试
+└── frontend/src/
+    ├── api/              # 按业务域组织的请求
+    ├── components/       # 认证外壳、打卡表单等复用组件
+    ├── composables/      # 分页查询等组合逻辑
+    ├── views/            # 页面
+    ├── stores/           # 会话状态
+    └── utils/            # 请求、日期和媒体工具
 ```
 
-## 🚀 快速开始
+## 本地启动
 
-### 环境要求
-- JDK 21+
-- MySQL 8.x
-- Node.js 18+
-- Maven 3.9+
+环境要求：JDK 21、MySQL 8、Node.js 18+。仓库已包含 Maven Wrapper。
 
-### 1. 初始化数据库
+### 1. 创建空数据库
 
 ```sql
--- 在 MySQL 中执行建表脚本
-source src/main/resources/sql/init.sql
+CREATE DATABASE strays_community
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
 ```
 
-### 2. 修改配置
+表结构由 Flyway 在后端启动时自动创建和升级，不再手工执行建表脚本。
 
-编辑 `src/main/resources/application.yaml`，修改数据库连接信息：
+### 2. 设置运行环境
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/strays_community?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: your_username
-    password: your_password
+必须提供数据库密码和长度至少 32 个字符的 JWT 密钥。PowerShell 示例：
+
+```powershell
+$env:DB_PASSWORD = "你的数据库密码"
+$env:JWT_SECRET = "请替换为至少32字符的随机高强度密钥"
 ```
+
+可选配置：
+
+```powershell
+$env:DB_URL = "jdbc:mysql://localhost:3306/strays_community?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai"
+$env:DB_USERNAME = "root"
+$env:CORS_ALLOWED_ORIGINS = "http://localhost:5173"
+$env:UPLOAD_PATH = "./uploads/"
+```
+
+项目不再内置默认管理员。首次启动时可以临时提供：
+
+```powershell
+$env:BOOTSTRAP_ADMIN_USERNAME = "admin"
+$env:BOOTSTRAP_ADMIN_PASSWORD = "请使用独立的强密码"
+```
+
+管理员创建后应清除这两个环境变量。若旧数据库仍保留历史示例账号，请在部署前替换或移除该账号。
 
 ### 3. 启动后端
 
@@ -92,7 +86,7 @@ spring:
 ./mvnw spring-boot:run
 ```
 
-后端启动于 http://localhost:8080
+后端默认地址为 `http://localhost:8080`，API 文档位于 `http://localhost:8080/swagger-ui/index.html`。
 
 ### 4. 启动前端
 
@@ -102,53 +96,23 @@ npm install
 npm run dev
 ```
 
-前端启动于 http://localhost:5173
+前端默认地址为 `http://localhost:5173`。
 
-### 5. 访问系统
+## 质量验证
 
-- 前端页面：http://localhost:5173
-- API 文档：http://localhost:8080/swagger-ui/index.html
-- 默认管理员：用户名 `admin`，密码 `admin123`
+```bash
+./mvnw test
+cd frontend
+npm run check
+```
 
-## 📡 API 接口
+后端测试覆盖认证/授权路径、数据库角色校验、图片内容识别与清理、关联查询边界。前端 `check` 会执行生产构建，验证 Vue 模板、模块引用和打包过程。
 
-### 认证模块
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | `/api/auth/register` | 用户注册 |
-| POST | `/api/auth/login` | 用户登录 |
-| GET | `/api/auth/info` | 获取当前用户信息 |
+## 安全与部署说明
 
-### 动物图鉴模块
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/animals` | 分页查询动物列表 |
-| GET | `/api/animals/{id}` | 获取动物详情 |
-| POST | `/api/animals` | 新增动物档案（管理员） |
-| PUT | `/api/animals/{id}` | 更新动物信息（管理员） |
-| DELETE | `/api/animals/{id}` | 删除动物档案（管理员） |
-
-### 打卡动态模块
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | `/api/checkins` | 发布打卡 |
-| GET | `/api/animals/{id}/checkins` | 动物打卡时间轴 |
-| GET | `/api/checkins/my` | 我的打卡记录 |
-
-## 👥 系统角色
-
-| 角色 | 权限 |
-|------|------|
-| 普通用户 | 浏览动物信息、发布打卡动态、查看时间轴 |
-| 管理员 | 全部普通用户权限 + 动物档案 CRUD 管理 |
-
-## 📸 功能特性
-
-- ✅ JWT 无状态认证，前后端分离
-- ✅ 动物档案 CRUD（含封面图片上传）
-- ✅ 按名字模糊搜索、按类型筛选、分页查询
-- ✅ 偶遇打卡发布与时间轴展示
-- ✅ 基于角色的权限控制（@RequireAdmin 注解）
-- ✅ RESTful API 设计 + Knife4j 接口文档
-- ✅ 全局异常处理 + 参数校验
-- ✅ MyBatis-Plus 逻辑删除 + 自动填充
+- `POST/PUT/DELETE /api/animals/**` 必须登录且必须为当前数据库中的管理员角色。
+- 公开接口仅限动物列表、动物详情和对应近况的 `GET` 请求。
+- 图片扩展名由文件签名确定，上传目录会进行规范化路径校验。
+- CORS 默认只允许本地前端；生产环境应显式设置实际域名。
+- API 的业务错误会返回相应 HTTP 状态码，服务端异常不会向客户端暴露内部消息。
+- 升级已有数据库前请备份数据。若历史数据违反外键或检查约束，Flyway 会停止迁移并要求先修复数据。

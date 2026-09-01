@@ -3,18 +3,22 @@ spring:
     name: StraysCommunity
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/strays_community?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
+    url: ${DB_URL:jdbc:mysql://localhost:3306/strays_community?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 10MB
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
 
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
   global-config:
     db-config:
       logic-delete-field: isDeleted
@@ -27,7 +31,12 @@ server:
 # 自定义配置
 app:
   jwt:
-    secret: StraysCommunitySecretKeyForJWTTokenGeneration2024VeryLongKey
-    expiration: 86400000
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION:86400000}
   upload:
-    path: ./uploads/
+    path: ${UPLOAD_PATH:./uploads/}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  bootstrap-admin:
+    username: ${BOOTSTRAP_ADMIN_USERNAME:}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}

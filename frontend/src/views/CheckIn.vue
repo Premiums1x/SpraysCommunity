@@ -1,59 +1,21 @@
 <template>
-  <div class="checkin-container">
+  <div class="page-shell checkin-container">
+    <aside class="checkin-intro">
+      <p class="page-kicker">Share a sighting</p>
+      <h1 class="page-heading">记录一次校园偶遇</h1>
+      <p class="page-lead">尽量写清时间、位置与精神状态。可靠的小细节，比一句“今天也很好”更能帮助后续照护。</p>
+      <div class="notice"><strong>温柔提醒</strong><span>不要公开精确窝点，也不要为了拍照追赶或投喂不适合的食物。</span></div>
+    </aside>
     <el-card class="checkin-card" shadow="never">
       <template #header>
-        <h2 class="page-title">📝 发布打卡</h2>
+        <h2 class="page-title">填写近况</h2>
       </template>
-      <el-form
-        ref="formRef"
-        :model="checkinForm"
-        :rules="rules"
-        label-position="top"
-      >
-        <el-form-item label="选择动物" prop="animalId">
-          <el-select
-            v-model="checkinForm.animalId"
-            placeholder="请选择要打卡的动物"
-            filterable
-            style="width: 100%"
-            :loading="animalsLoading"
-          >
-            <el-option
-              v-for="animal in animalOptions"
-              :key="animal.id"
-              :label="animal.name + (animal.type === 1 ? ' 🐱' : ' 🐶')"
-              :value="animal.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="打卡内容" prop="content">
-          <el-input
-            v-model="checkinForm.content"
-            type="textarea"
-            :rows="6"
-            placeholder="记录你与这只小动物的故事吧..."
-            maxlength="500"
-            show-word-limit
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-switch
-            v-model="checkinForm.anonymous"
-            active-text="匿名发布"
-            inactive-text="显示用户名"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :loading="submitLoading" @click="handleSubmit">
-            提交打卡
-          </el-button>
-        </el-form-item>
-      </el-form>
+      <CheckInForm show-animal-select @submitted="handleSubmitted" />
     </el-card>
 
     <!-- 提交成功提示 -->
-    <el-dialog v-model="showSuccessDialog" title="打卡成功 🎉" width="400px" :close-on-click-modal="false">
-      <p>你的打卡已成功提交！接下来你想？</p>
+    <el-dialog v-model="showSuccessDialog" title="打卡成功" width="min(400px, 92vw)" :close-on-click-modal="false">
+      <p>这条记录已经加入动物的近况时间轴。</p>
       <template #footer>
         <el-button @click="continueCheckin">继续打卡</el-button>
         <el-button type="primary" @click="goDetail">查看该动物详情</el-button>
@@ -63,67 +25,21 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import request from '../utils/request'
-import { ElMessage } from 'element-plus'
+import CheckInForm from '../components/CheckInForm.vue'
 
 const router = useRouter()
-const formRef = ref(null)
-const submitLoading = ref(false)
-const animalsLoading = ref(false)
-const animalOptions = ref([])
 const showSuccessDialog = ref(false)
 const lastAnimalId = ref(null)
 
-const checkinForm = reactive({
-  animalId: null,
-  content: '',
-  anonymous: false
-})
-
-const rules = {
-  animalId: [{ required: true, message: '请选择动物', trigger: 'change' }],
-  content: [{ required: true, message: '请输入打卡内容', trigger: 'blur' }]
-}
-
-const fetchAnimals = async () => {
-  animalsLoading.value = true
-  try {
-    const res = await request.get('/api/animals', { params: { page: 1, size: 100 } })
-    animalOptions.value = res.data.records
-  } catch (error) {
-    // handled by interceptor
-  } finally {
-    animalsLoading.value = false
-  }
-}
-
-const handleSubmit = async () => {
-  if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitLoading.value = true
-    try {
-      await request.post('/api/checkins', {
-        animalId: checkinForm.animalId,
-        content: checkinForm.content,
-        anonymous: checkinForm.anonymous
-      })
-      lastAnimalId.value = checkinForm.animalId
-      showSuccessDialog.value = true
-    } catch (error) {
-      // handled by interceptor
-    } finally {
-      submitLoading.value = false
-    }
-  })
+const handleSubmitted = animalId => {
+  lastAnimalId.value = animalId
+  showSuccessDialog.value = true
 }
 
 const continueCheckin = () => {
   showSuccessDialog.value = false
-  checkinForm.content = ''
-  checkinForm.anonymous = false
 }
 
 const goDetail = () => {
@@ -131,23 +47,31 @@ const goDetail = () => {
   router.push(`/animals/${lastAnimalId.value}`)
 }
 
-onMounted(() => {
-  fetchAnimals()
-})
 </script>
 
 <style scoped>
 .checkin-container {
-  max-width: 700px;
-  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(280px, .8fr) minmax(420px, 1.2fr);
+  gap: clamp(28px, 6vw, 72px);
+  align-items: start;
+  padding-top: 42px;
 }
 
 .checkin-card {
-  border-radius: 12px;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .page-title {
   margin: 0;
-  color: #303133;
+  color: var(--color-text);
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 24px;
 }
+.notice { margin-top: 34px; padding: 18px 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+.notice strong, .notice span { display: block; }
+.notice strong { margin-bottom: 6px; color: var(--color-accent); font-size: 13px; }
+.notice span { color: var(--color-text-muted); font-size: 13px; line-height: 1.7; }
+@media (max-width: 780px) { .checkin-container { grid-template-columns: 1fr; padding-top: 20px; } }
 </style>

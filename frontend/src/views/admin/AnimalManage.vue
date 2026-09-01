@@ -88,7 +88,7 @@
     <el-dialog
       v-model="dialogVisible"
       :title="isEdit ? '编辑动物' : '新增动物'"
-      width="550px"
+      width="min(720px, 94vw)"
       @close="resetForm"
     >
       <el-form
@@ -116,6 +116,37 @@
             :rows="3"
             placeholder="请输入描述信息"
           />
+        </el-form-item>
+        <div class="form-grid">
+          <el-form-item label="别名">
+            <el-input v-model="animalForm.aliases" placeholder="多个别名用逗号分隔" maxlength="255" />
+          </el-form-item>
+          <el-form-item label="性别">
+            <el-select v-model="animalForm.gender" style="width: 100%">
+              <el-option label="未知" :value="0" />
+              <el-option label="公" :value="1" />
+              <el-option label="母" :value="2" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="健康状态">
+            <el-select v-model="animalForm.healthStatus" style="width: 100%">
+              <el-option label="状态良好" value="HEALTHY" />
+              <el-option label="需要观察" value="OBSERVE" />
+              <el-option label="需要帮助" value="NEEDS_HELP" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="绝育情况">
+            <el-switch v-model="animalForm.sterilized" active-text="已绝育" inactive-text="未确认" />
+          </el-form-item>
+          <el-form-item label="首次发现">
+            <el-date-picker v-model="animalForm.firstSeenDate" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width: 100%" />
+          </el-form-item>
+          <el-form-item label="活跃时段">
+            <el-input v-model="animalForm.activeTime" placeholder="如：傍晚 17:00 后" maxlength="100" />
+          </el-form-item>
+        </div>
+        <el-form-item label="性格标签">
+          <el-input v-model="animalForm.personalityTags" placeholder="如：亲人、怕生、爱晒太阳" maxlength="255" />
         </el-form-item>
         <el-form-item label="封面图片">
           <el-upload
@@ -146,16 +177,14 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import request from '../../utils/request'
+import { createAnimal, deleteAnimal, toAnimalFormData, updateAnimal } from '../../api/animals'
+import { usePagedAnimals } from '../../composables/usePagedAnimals'
 import { ElMessage } from 'element-plus'
 
-const animalList = ref([])
-const loading = ref(false)
-const searchName = ref('')
-const searchType = ref('')
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
+const {
+  animalList, loading, searchName, searchType, currentPage, pageSize, total,
+  fetchAnimals, search: handleSearch, changePageSize: handleSizeChange
+} = usePagedAnimals(10)
 
 const dialogVisible = ref(false)
 const isEdit = ref(false)
@@ -169,39 +198,20 @@ const animalForm = reactive({
   name: '',
   type: null,
   area: '',
-  description: ''
+  description: '',
+  aliases: '',
+  gender: 0,
+  personalityTags: '',
+  sterilized: false,
+  healthStatus: 'HEALTHY',
+  firstSeenDate: '',
+  activeTime: ''
 })
 
 const formRules = {
   name: [{ required: true, message: '请输入动物名字', trigger: 'blur' }],
   type: [{ required: true, message: '请选择类型', trigger: 'change' }],
   area: [{ required: true, message: '请输入常驻区域', trigger: 'blur' }]
-}
-
-const fetchAnimals = async () => {
-  loading.value = true
-  try {
-    const params = { page: currentPage.value, size: pageSize.value }
-    if (searchName.value) params.name = searchName.value
-    if (searchType.value !== '') params.type = searchType.value
-    const res = await request.get('/api/animals', { params })
-    animalList.value = res.data.records
-    total.value = res.data.total
-  } catch (error) {
-    // handled by interceptor
-  } finally {
-    loading.value = false
-  }
-}
-
-const handleSearch = () => {
-  currentPage.value = 1
-  fetchAnimals()
-}
-
-const handleSizeChange = () => {
-  currentPage.value = 1
-  fetchAnimals()
 }
 
 const handleAdd = () => {
@@ -216,6 +226,13 @@ const handleEdit = (row) => {
   animalForm.type = row.type
   animalForm.area = row.area
   animalForm.description = row.description || ''
+  animalForm.aliases = row.aliases || ''
+  animalForm.gender = row.gender ?? 0
+  animalForm.personalityTags = row.personalityTags || ''
+  animalForm.sterilized = Boolean(row.sterilized)
+  animalForm.healthStatus = row.healthStatus || 'HEALTHY'
+  animalForm.firstSeenDate = row.firstSeenDate || ''
+  animalForm.activeTime = row.activeTime || ''
   dialogVisible.value = true
 }
 
@@ -232,6 +249,13 @@ const resetForm = () => {
   animalForm.type = null
   animalForm.area = ''
   animalForm.description = ''
+  animalForm.aliases = ''
+  animalForm.gender = 0
+  animalForm.personalityTags = ''
+  animalForm.sterilized = false
+  animalForm.healthStatus = 'HEALTHY'
+  animalForm.firstSeenDate = ''
+  animalForm.activeTime = ''
   selectedFile.value = null
   editId.value = null
   if (uploadRef.value) {
@@ -245,30 +269,12 @@ const handleSubmit = async () => {
     if (!valid) return
     submitLoading.value = true
     try {
+      const formData = toAnimalFormData(animalForm, selectedFile.value)
       if (isEdit.value) {
-        // 编辑 - 使用 JSON
-        await request.put(`/api/animals/${editId.value}`, {
-          name: animalForm.name,
-          type: animalForm.type,
-          area: animalForm.area,
-          description: animalForm.description
-        })
+        await updateAnimal(editId.value, formData)
         ElMessage.success('修改成功')
       } else {
-        // 新增 - 使用 FormData (multipart/form-data)
-        const formData = new FormData()
-        formData.append('name', animalForm.name)
-        formData.append('type', animalForm.type)
-        formData.append('area', animalForm.area)
-        if (animalForm.description) {
-          formData.append('description', animalForm.description)
-        }
-        if (selectedFile.value) {
-          formData.append('file', selectedFile.value)
-        }
-        await request.post('/api/animals', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        })
+        await createAnimal(formData)
         ElMessage.success('新增成功')
       }
       dialogVisible.value = false
@@ -283,7 +289,7 @@ const handleSubmit = async () => {
 
 const handleDelete = async (id) => {
   try {
-    await request.delete(`/api/animals/${id}`)
+    await deleteAnimal(id)
     ElMessage.success('删除成功')
     fetchAnimals()
   } catch (error) {
@@ -343,9 +349,17 @@ onMounted(() => {
   justify-content: center;
   margin-top: 20px;
 }
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 18px;
+}
 
 @media (max-width: 768px) {
   .search-row {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
     grid-template-columns: 1fr;
   }
 }

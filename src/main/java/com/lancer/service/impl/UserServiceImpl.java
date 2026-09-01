@@ -8,7 +8,6 @@ import com.lancer.entity.User;
 import com.lancer.mapper.UserMapper;
 import com.lancer.service.UserService;
 import com.lancer.utils.JwtUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +17,14 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
+    private final UserMapper userMapper;
+    private final JwtUtils jwtUtils;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public UserServiceImpl(UserMapper userMapper, JwtUtils jwtUtils) {
+        this.userMapper = userMapper;
+        this.jwtUtils = jwtUtils;
+    }
 
     @Override
     public Map<String, Object> login(LoginRequest request) {

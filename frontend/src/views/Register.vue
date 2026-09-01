@@ -1,8 +1,5 @@
 <template>
-  <div class="register-container">
-    <el-card class="register-card" shadow="always">
-      <h2 class="register-title">🐾 校园流浪动物图鉴</h2>
-      <p class="register-subtitle">创建您的账号</p>
+  <AuthShell eyebrow="Join the community" title="创建账号" description="注册后即可记录偶遇。昵称会在非匿名打卡中展示，用户名仅用于登录。">
       <el-form
         ref="formRef"
         :model="registerForm"
@@ -30,7 +27,7 @@
           <el-input
             v-model="registerForm.password"
             type="password"
-            placeholder="请输入密码（6-20字符）"
+            placeholder="请输入密码（8-72字符）"
             prefix-icon="Lock"
             size="large"
             show-password
@@ -50,7 +47,7 @@
           <el-button
             type="primary"
             size="large"
-            style="width: 100%"
+            class="submit-button"
             :loading="loading"
             @click="handleRegister"
           >
@@ -58,11 +55,10 @@
           </el-button>
         </el-form-item>
       </el-form>
-      <div class="register-footer">
+      <template #footer>
         已有账号？<router-link to="/login">去登录</router-link>
-      </div>
-    </el-card>
-  </div>
+      </template>
+  </AuthShell>
 </template>
 
 <script setup>
@@ -70,6 +66,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { ElMessage } from 'element-plus'
+import AuthShell from '../components/AuthShell.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -101,7 +98,7 @@ const rules = {
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度为6-20个字符', trigger: 'blur' }
+    { min: 8, max: 72, message: '密码长度为8-72个字符', trigger: 'blur' }
   ],
   confirmPassword: [
     { required: true, message: '请确认密码', trigger: 'blur' },
@@ -132,46 +129,5 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
-.register-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.register-card {
-  width: 420px;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.register-title {
-  text-align: center;
-  font-size: 24px;
-  color: #303133;
-  margin-bottom: 8px;
-}
-
-.register-subtitle {
-  text-align: center;
-  color: #909399;
-  margin-bottom: 24px;
-  font-size: 14px;
-}
-
-.register-footer {
-  text-align: center;
-  color: #909399;
-  font-size: 14px;
-}
-
-.register-footer a {
-  color: #409eff;
-  text-decoration: none;
-}
-
-.register-footer a:hover {
-  text-decoration: underline;
-}
+.submit-button { width: 100%; }
 </style>

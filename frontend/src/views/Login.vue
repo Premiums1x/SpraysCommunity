@@ -1,8 +1,5 @@
 <template>
-  <div class="login-container">
-    <el-card class="login-card" shadow="always">
-      <h2 class="login-title">🐾 校园流浪动物图鉴</h2>
-      <p class="login-subtitle">欢迎回来，请登录您的账号</p>
+  <AuthShell eyebrow="Welcome back" title="欢迎回来" description="登录后可以发布偶遇记录、查看自己的打卡，并参与校园动物的持续照护。">
       <el-form
         ref="formRef"
         :model="loginForm"
@@ -32,7 +29,7 @@
           <el-button
             type="primary"
             size="large"
-            style="width: 100%"
+            class="submit-button"
             :loading="loading"
             @click="handleLogin"
           >
@@ -40,20 +37,21 @@
           </el-button>
         </el-form-item>
       </el-form>
-      <div class="login-footer">
+      <template #footer>
         没有账号？<router-link to="/register">去注册</router-link>
-      </div>
-    </el-card>
-  </div>
+      </template>
+  </AuthShell>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { ElMessage } from 'element-plus'
+import AuthShell from '../components/AuthShell.vue'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const formRef = ref(null)
 const loading = ref(false)
@@ -76,7 +74,10 @@ const handleLogin = async () => {
     try {
       await userStore.login(loginForm)
       ElMessage.success('登录成功')
-      router.push('/animals')
+      const destination = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
+        ? route.query.redirect
+        : '/animals'
+      router.push(destination)
     } catch (error) {
       // error handled by interceptor
     } finally {
@@ -87,46 +88,5 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.login-card {
-  width: 420px;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.login-title {
-  text-align: center;
-  font-size: 24px;
-  color: #303133;
-  margin-bottom: 8px;
-}
-
-.login-subtitle {
-  text-align: center;
-  color: #909399;
-  margin-bottom: 24px;
-  font-size: 14px;
-}
-
-.login-footer {
-  text-align: center;
-  color: #909399;
-  font-size: 14px;
-}
-
-.login-footer a {
-  color: #409eff;
-  text-decoration: none;
-}
-
-.login-footer a:hover {
-  text-decoration: underline;
-}
+.submit-button { width: 100%; }
 </style>

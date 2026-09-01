@@ -1,14 +1,16 @@
 package com.lancer.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.lancer.dto.AnimalCreateRequest;
 import com.lancer.dto.AnimalQueryRequest;
-import com.lancer.entity.Animal;
+import com.lancer.dto.AnimalResponse;
+import com.lancer.dto.AnimalUpdateRequest;
+import com.lancer.dto.PageResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AnimalService {
-    IPage<Animal> getAnimalList(AnimalQueryRequest request);
-    Animal getAnimalById(Long id);
-    void addAnimal(Animal animal, MultipartFile file);
-    void updateAnimal(Long id, Animal animal);
+    PageResponse<AnimalResponse> getAnimalList(AnimalQueryRequest request);
+    AnimalResponse getAnimalById(Long id);
+    void addAnimal(AnimalCreateRequest request, MultipartFile file);
+    void updateAnimal(Long id, AnimalUpdateRequest request, MultipartFile file);
     void deleteAnimal(Long id);
 }

@@ -2,6 +2,7 @@ package com.lancer.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -20,6 +21,20 @@ public class Animal {
     private String coverImage;
 
     private String description;
+
+    private String aliases;
+
+    private Integer gender;
+
+    private String personalityTags;
+
+    private Boolean sterilized;
+
+    private String healthStatus;
+
+    private LocalDate firstSeenDate;
+
+    private String activeTime;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

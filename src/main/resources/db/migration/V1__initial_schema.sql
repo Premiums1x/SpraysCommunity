@@ -1,9 +1,3 @@
--- 创建数据库
-CREATE DATABASE IF NOT EXISTS strays_community DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-
-USE strays_community;
-
--- 用户表
 CREATE TABLE IF NOT EXISTS `user` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '用户ID',
     `username` VARCHAR(50) NOT NULL COMMENT '用户名',
@@ -17,7 +11,6 @@ CREATE TABLE IF NOT EXISTS `user` (
     UNIQUE KEY `uk_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
--- 动物档案表
 CREATE TABLE IF NOT EXISTS `animal` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '动物ID',
     `name` VARCHAR(50) NOT NULL COMMENT '暂定名字',
@@ -33,7 +26,6 @@ CREATE TABLE IF NOT EXISTS `animal` (
     KEY `idx_type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='动物档案表';
 
--- 打卡动态表
 CREATE TABLE IF NOT EXISTS `check_in` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '打卡ID',
     `user_id` BIGINT NOT NULL COMMENT '打卡用户ID',
@@ -45,7 +37,3 @@ CREATE TABLE IF NOT EXISTS `check_in` (
     KEY `idx_animal_id_create_time` (`animal_id`, `create_time` DESC),
     KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='打卡动态表';
-
--- 插入默认管理员账号（密码为 admin123，BCrypt加密）
-INSERT INTO `user` (`username`, `password`, `nickname`, `role`) VALUES 
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', '系统管理员', 1);

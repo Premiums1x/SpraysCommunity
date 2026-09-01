@@ -1,10 +1,19 @@
 import { defineStore } from 'pinia'
-import request from '../utils/request'
+import * as authApi from '../api/auth'
+
+const readStoredUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('userInfo') || 'null')
+  } catch {
+    localStorage.removeItem('userInfo')
+    return null
+  }
+}
 
 export const useUserStore = defineStore('user', {
   state: () => ({
     token: localStorage.getItem('token') || '',
-    userInfo: JSON.parse(localStorage.getItem('userInfo') || 'null')
+    userInfo: readStoredUser()
   }),
   getters: {
     isLogin: (state) => !!state.token,
@@ -12,7 +21,7 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     async login(loginForm) {
-      const res = await request.post('/api/auth/login', loginForm)
+      const res = await authApi.login(loginForm)
       this.token = res.data.token
       this.userInfo = res.data.user
       localStorage.setItem('token', res.data.token)
@@ -20,11 +29,11 @@ export const useUserStore = defineStore('user', {
       return res
     },
     async register(registerForm) {
-      const res = await request.post('/api/auth/register', registerForm)
+      const res = await authApi.register(registerForm)
       return res
     },
     async getUserInfo() {
-      const res = await request.get('/api/auth/info')
+      const res = await authApi.getCurrentUser()
       this.userInfo = res.data
       localStorage.setItem('userInfo', JSON.stringify(res.data))
       return res

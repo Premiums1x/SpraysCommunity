@@ -7,4 +7,6 @@ public interface FileService {
      * 上传文件，返回文件名（相对路径）
      */
     String upload(MultipartFile file);
+
+    void delete(String fileName);
 }

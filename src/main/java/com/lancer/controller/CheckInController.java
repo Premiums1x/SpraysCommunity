@@ -1,20 +1,27 @@
 package com.lancer.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.lancer.common.result.Result;
 import com.lancer.dto.CheckInRequest;
 import com.lancer.dto.CheckInVO;
+import com.lancer.dto.PageResponse;
 import com.lancer.service.CheckInService;
 import com.lancer.utils.UserContext;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Validated
 public class CheckInController {
 
-    @Autowired
-    private CheckInService checkInService;
+    private final CheckInService checkInService;
+
+    public CheckInController(CheckInService checkInService) {
+        this.checkInService = checkInService;
+    }
 
     /**
      * 发布打卡（需登录）
@@ -30,11 +37,11 @@ public class CheckInController {
      * 查询某动物的打卡时间轴（公开接口）
      */
     @GetMapping("/api/animals/{animalId}/checkins")
-    public Result<IPage<CheckInVO>> getCheckInsByAnimal(
-            @PathVariable Long animalId,
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
-        IPage<CheckInVO> result = checkInService.getCheckInsByAnimalId(animalId, page, size);
+    public Result<PageResponse<CheckInVO>> getCheckInsByAnimal(
+            @PathVariable @Positive Long animalId,
+            @RequestParam(defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(50) Integer size) {
+        PageResponse<CheckInVO> result = checkInService.getCheckInsByAnimalId(animalId, page, size);
         return Result.success(result);
     }
 
@@ -42,11 +49,11 @@ public class CheckInController {
      * 查询我的打卡记录（需登录）
      */
     @GetMapping("/api/checkins/my")
-    public Result<IPage<CheckInVO>> getMyCheckIns(
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
+    public Result<PageResponse<CheckInVO>> getMyCheckIns(
+            @RequestParam(defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(50) Integer size) {
         Long userId = UserContext.getCurrentUserId();
-        IPage<CheckInVO> result = checkInService.getMyCheckIns(userId, page, size);
+        PageResponse<CheckInVO> result = checkInService.getMyCheckIns(userId, page, size);
         return Result.success(result);
     }
 }
