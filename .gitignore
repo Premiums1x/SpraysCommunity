@@ -1,4 +1,9 @@
 HELP.md
+projectCompletion.md
+projectDesign.md
+
+/qoder/*
+
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
